@@ -1,0 +1,11 @@
+name: BetterWings
+main: com.james137137.BetterWings.BetterWings
+version: 0.0.2
+authors: [James Anderson]
+commands:
+  BetterWings:
+    description: Main Command for BetterWings
+  WingEffect:
+    description: toggle wing effect
+  WingSpeed:
+    description: Change flight speed
