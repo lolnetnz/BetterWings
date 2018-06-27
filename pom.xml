@@ -13,23 +13,22 @@
     
     <repositories>
         <repository>
-            <id>lolnet-repo</id>
-            <url>http://jenkins.lolnet.co.nz/plugin/repository/everything/</url>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
     <build>
         <finalName>BetterWings</finalName>
     </build>
     <dependencies>
+        
+        <!--Bukkit API-->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>nz.co.lolnet</groupId>
-            <artifactId>LolnetAPI-core</artifactId>
-            <version>1.0.2</version>
-        </dependency>
+        
     </dependencies>
 </project>

@@ -4,28 +4,19 @@
  */
 package com.james137137.BetterWings;
 
-import static com.james137137.BetterWings.BetterWings.minigame;
 import java.util.HashMap;
 import java.util.Random;
 import org.bukkit.Effect;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -62,51 +53,6 @@ class MyListener implements Listener {
                 if (speed > 0.4) {
                     setSpeed(player2, speed, 0.1 * speed);
                 }
-            }
-
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteractEntity(PlayerInteractEvent event) {
-        if (!minigame) {
-            return;
-        }
-        if (event.getAction() == Action.LEFT_CLICK_AIR) {
-            if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.TNT) {
-                spawnTNTTrap(event.getPlayer().getLocation());
-                event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-            } else if (event.getPlayer().getInventory().getItemInMainHand().getType() == Material.COAL_BLOCK) {
-
-                setBlindnessTrap(event.getPlayer().getLocation());
-                event.getPlayer().getInventory().setItemInMainHand(new ItemStack(Material.AIR));
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerPickup(PlayerPickupItemEvent event) {
-        if (!minigame) {
-            return;
-        }
-        if (event.getItem().getItemStack().getType() == Material.TNT) {
-            event.setCancelled(true);
-            if (BetterWings.isGliding(event.getPlayer())) {
-                event.getPlayer().getWorld().createExplosion(event.getPlayer().getLocation().getX(), event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ(),
-                        10, false, false);
-                setSpeed(event.getPlayer(), getSpeed(event.getPlayer()), 0.1);
-            } else {
-                event.getItem().remove();
-            }
-
-        } else if (event.getItem().getItemStack().getType() == Material.COAL_BLOCK) {
-            event.setCancelled(true);
-            if (BetterWings.isGliding(event.getPlayer())) {
-                event.getPlayer().getWorld().createExplosion(event.getPlayer().getLocation().getX(), event.getPlayer().getLocation().getY(), event.getPlayer().getLocation().getZ(),
-                        10, false, false);
-                event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10 * 20, 50));
-            } else {
-                event.getItem().remove();
             }
 
         }
@@ -169,14 +115,6 @@ class MyListener implements Listener {
         Location from = event.getFrom();
         if (to.getX() != from.getX() || to.getZ() != from.getZ()) {
             if (BetterWings.isGliding(player)) {
-                String owner = LolnetWings.getOwner(player.getInventory().getChestplate());
-                //System.out.println(owner);
-                if (owner.equals("")) {
-                    player.getInventory().setChestplate(LolnetWings.setOwner(player.getInventory().getChestplate(), player.getName()));
-                } else if (!owner.equalsIgnoreCase(player.getName())) {
-                    player.getInventory().getChestplate().setDurability((short) 500);
-                    return;
-                }
                 lastGliding.put(player.getName(), System.currentTimeMillis());
                 double speed = getSpeed(player);
                 Double targetSpeed = targetSpeedMap.get(player.getName());
@@ -185,61 +123,8 @@ class MyListener implements Listener {
                     targetSpeedMap.put(player.getName(), targetSpeed);
                 }
                 Location location = player.getLocation();
-                if (minigame) {
-                    Material ring = getRing(location, 6);
-                    if (null != ring) {
-                        switch (ring) {
-                            case DIAMOND_BLOCK:
-                                lastBoost.put(player.getName(), System.currentTimeMillis());
-                                int time = 2;
-                                superBooster.put(player.getName(), System.currentTimeMillis() + time * 1000);
-                                player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 20 * time, 3, true, false));
-                                player.setExp(0.50F);
-                                return;
-                            case TNT:
-                                player.getInventory().addItem(new ItemStack(Material.TNT));
-                                break;
-                            case SNOW_BLOCK:
-                                player.getInventory().addItem(new ItemStack(Material.SNOW_BALL, 64));
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    //boast key
-                    if (player.isSneaking() && (speed <= MaxSpeed && player.getExp() - 0.01F > 0 || player.getGameMode() == GameMode.CREATIVE)) { 
-                        player.setExp(player.getExp() - 0.01F);
-                        setSpeed(player, getSpeed(player), 1.05 * speed);
-                        lastBoost.put(player.getName(), System.currentTimeMillis());
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 5, 0, true, false));
-                        player.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 20 * 2, 0, true, false));
-                        //setSpeed(player, speed, 0.5 * speed);
-                        return;
-                    }
-                }
 
                 if (player.getLocation().getY() < 250) {
-                    if (minigame) {
-                        if (superBooster.get(player.getName()) != null) {
-                            if (System.currentTimeMillis() - superBooster.get(player.getName()) < 0) {
-                                setSpeed(player, getSpeed(player), 1.1 * speed);
-                            } else {
-                                superBooster.put(player.getName(), null);
-                            }
-                            return;
-                        }
-
-                        if (lastBoost.get(player.getName()) == null || System.currentTimeMillis() - lastBoost.get(player.getName()) >= 2000L) {
-                            if (player.getExp() < 0.99F) {
-                                if (speed > 0.99 * targetSpeed && speed <= 2 * targetSpeed && player.getExp() + 0.005F <= 1 ) {
-                                    player.setExp(player.getExp() + 0.005F);
-                                } else if (player.getExp() > 0 && speed < 0.9 * targetSpeed && player.getExp() - 0.0025F >= 0) {
-                                    player.setExp(player.getExp() - 0.0025F);
-                                }
-                            }
-                        }
-                    }
                     if (speed > 0.3 && AFKCheck(player)) {
                         if (System.currentTimeMillis() - lastLocationChangePY.get(player.getName()) >= 10 * 1000) {
                             float pitch = player.getLocation().getPitch();
@@ -298,67 +183,6 @@ class MyListener implements Listener {
 
         vel.setZ(targetSpeed * vel.getZ() / speed);
         player.setVelocity(vel);
-    }
-
-    private void spawnTNTTrap(Location location) {
-        Random r = new Random();
-        location.setY(location.getY());
-        for (int i = 0; i < 30; i++) {
-            Location to = new Location(location.getWorld(), location.getX() + (r.nextDouble() * 2 - 1),
-                    location.getY() + (r.nextDouble() * 2 - 1),
-                    location.getZ() + (r.nextDouble() * 2 - 1));
-            final Bat myBat = (Bat) location.getWorld().spawnEntity(to, EntityType.BAT);
-            final Item item = location.getWorld().dropItem(to, new ItemStack(Material.TNT));
-            item.setPickupDelay(2 * 20);
-            myBat.setPassenger(item);
-            myBat.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20000000, 20));
-            new BetterWings.ThreadedFloatingEntity(myBat, item);
-        }
-    }
-
-    private void setBlindnessTrap(Location location) {
-        Random r = new Random();
-        location.setY(location.getY());
-        for (int i = 0; i < 30; i++) {
-            Location to = new Location(location.getWorld(), location.getX() + (r.nextDouble() * 2 - 1),
-                    location.getY() + (r.nextDouble() * 2 - 1),
-                    location.getZ() + (r.nextDouble() * 2 - 1));
-            final Bat myBat = (Bat) location.getWorld().spawnEntity(to, EntityType.BAT);
-            final Item item = location.getWorld().dropItem(to, new ItemStack(Material.COAL_BLOCK));
-            item.setPickupDelay(2 * 20);
-            myBat.setPassenger(item);
-            myBat.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 20000000, 20));
-            new BetterWings.ThreadedFloatingEntity(myBat, item);
-        }
-    }
-
-    private Material getRing(Location location, int MaxSearch) {
-        Material top = Material.AIR;
-        Material bottom = Material.AIR;
-        int Y = location.getBlockY();
-
-        for (int i = 1; i <= MaxSearch; i++) {
-            location.setY(Y + i);
-            //System.out.println(location.getBlock().getType());
-            if (location.getBlock().getType() != Material.AIR) {
-                top = location.getBlock().getType();
-                break;
-            }
-        }
-
-        for (int i = 1; i <= MaxSearch; i++) {
-            location.setY(Y - i);
-            //System.out.println(location.getBlock().getType());
-            if (location.getBlock().getType() != Material.AIR) {
-                bottom = location.getBlock().getType();
-                break;
-            }
-        }
-        if (top == bottom) {
-            return top;
-        } else {
-            return Material.AIR;
-        }
     }
 
     public boolean AFKCheck(Player player) {

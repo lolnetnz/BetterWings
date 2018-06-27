@@ -26,8 +26,7 @@ import org.bukkit.util.Vector;
  * @author James
  */
 public class BetterWings extends JavaPlugin {
-
-    static boolean minigame = false;
+    
     static HashSet<String> effectOff = new HashSet<>();
 
     public static boolean isGliding(Player player) {

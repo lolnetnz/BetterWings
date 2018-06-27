@@ -43,27 +43,4 @@ public class LolnetWings {
         }
 
     }
-
-    public static String getOwner(ItemStack item) {
-        if (item.getItemMeta() != null) {
-            List<String> lore = item.getItemMeta().getLore();
-            if (lore != null) {
-                for (String string : lore) {
-                    return ChatColor.stripColor(string);
-                }
-            }
-        }
-        return "";
-    }
-
-    public static ItemStack setOwner(ItemStack item, String player) {
-        if (item.getItemMeta() != null) {
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GOLD + player);
-            ItemMeta meta = item.getItemMeta();
-            meta.setLore(lore);
-            item.setItemMeta(meta);
-        }
-        return item;
-    }
 }
